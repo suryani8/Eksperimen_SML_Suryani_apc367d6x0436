@@ -1,0 +1,84 @@
+name: Preprocessing Pipeline - Heart Disease UCI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'preprocessing/automate_Suryani.py'
+      - 'heart_disease_uci.csv'
+      - '.workflow/preprocessing.yml'
+  workflow_dispatch:
+    inputs:
+      input_file:
+        description: 'Nama file dataset raw (default: heart_disease_uci.csv)'
+        required: false
+        default: 'heart_disease_uci.csv'
+
+jobs:
+  preprocessing:
+    name: Run Preprocessing Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy scikit-learn
+
+      - name: Check Dataset
+        run: |
+          INPUT="${{ github.event.inputs.input_file || 'heart_disease_uci.csv' }}"
+          if [ ! -f "$INPUT" ]; then
+            echo "ERROR: File $INPUT tidak ditemukan!"
+            exit 1
+          else
+            echo "Dataset ditemukan: $INPUT"
+            wc -l "$INPUT"
+          fi
+
+      - name: Run Preprocessing
+        run: |
+          python preprocessing/automate_Suryani.py --input ${{ github.event.inputs.input_file || 'heart_disease_uci.csv' }}
+
+      - name: Verify Output Files
+        run: |
+          echo "=== Verifikasi Output ==="
+          if [ -f "heart_preprocessing_train.csv" ]; then
+            echo "heart_preprocessing_train.csv: OK ($(wc -l < heart_preprocessing_train.csv) baris)"
+          else
+            echo "ERROR: heart_preprocessing_train.csv tidak ditemukan!"
+            exit 1
+          fi
+          if [ -f "heart_preprocessing_test.csv" ]; then
+            echo "heart_preprocessing_test.csv: OK ($(wc -l < heart_preprocessing_test.csv) baris)"
+          else
+            echo "ERROR: heart_preprocessing_test.csv tidak ditemukan!"
+            exit 1
+          fi
+
+      - name: Upload Preprocessed Data
+        uses: actions/upload-artifact@v3
+        with:
+          name: heart-preprocessed-${{ github.run_number }}
+          path: |
+            heart_preprocessing_train.csv
+            heart_preprocessing_test.csv
+          retention-days: 7
+
+      - name: Write Job Summary
+        run: |
+          echo "## Hasil Preprocessing Pipeline" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Jumlah Baris |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| heart_preprocessing_train.csv | $(wc -l < heart_preprocessing_train.csv) |" >> $GITHUB_STEP_SUMMARY
+          echo "| heart_preprocessing_test.csv  | $(wc -l < heart_preprocessing_test.csv) |" >> $GITHUB_STEP_SUMMARY
+          echo "Preprocessing selesai pada: $(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_STEP_SUMMARY
