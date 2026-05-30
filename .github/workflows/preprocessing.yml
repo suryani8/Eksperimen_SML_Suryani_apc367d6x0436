@@ -47,7 +47,8 @@ jobs:
 
       - name: Run Preprocessing
         run: |
-          python preprocessing/automate_Suryani.py --input ${{ github.event.inputs.input_file || 'heart_disease_uci.csv' }}
+          cp heart_disease_uci.csv preprocessing/heart_disease_uci.csv
+          python preprocessing/automate_Suryani.py --input heart_disease_uci.csv
 
       - name: Verify Output Files
         run: |
