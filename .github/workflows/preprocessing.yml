@@ -36,31 +36,30 @@ jobs:
 
       - name: Check Dataset
         run: |
-          INPUT="${{ github.event.inputs.input_file || 'heart_disease_uci.csv' }}"
-          if [ ! -f "$INPUT" ]; then
-            echo "ERROR: File $INPUT tidak ditemukan!"
+          if [ ! -f "heart_disease_uci.csv" ]; then
+            echo "ERROR: heart_disease_uci.csv tidak ditemukan!"
             exit 1
           else
-            echo "Dataset ditemukan: $INPUT"
-            wc -l "$INPUT"
+            echo "Dataset ditemukan!"
+            wc -l heart_disease_uci.csv
           fi
 
       - name: Run Preprocessing
         run: |
-          cp heart_disease_uci.csv preprocessing/heart_disease_uci.csv
-          python preprocessing/automate_Suryani.py --input heart_disease_uci.csv
+          cd preprocessing
+          python automate_Suryani.py --input ../heart_disease_uci.csv
 
       - name: Verify Output Files
         run: |
           echo "=== Verifikasi Output ==="
-          if [ -f "heart_preprocessing_train.csv" ]; then
-            echo "heart_preprocessing_train.csv: OK ($(wc -l < heart_preprocessing_train.csv) baris)"
+          if [ -f "preprocessing/heart_preprocessing_train.csv" ]; then
+            echo "heart_preprocessing_train.csv: OK"
           else
             echo "ERROR: heart_preprocessing_train.csv tidak ditemukan!"
             exit 1
           fi
-          if [ -f "heart_preprocessing_test.csv" ]; then
-            echo "heart_preprocessing_test.csv: OK ($(wc -l < heart_preprocessing_test.csv) baris)"
+          if [ -f "preprocessing/heart_preprocessing_test.csv" ]; then
+            echo "heart_preprocessing_test.csv: OK"
           else
             echo "ERROR: heart_preprocessing_test.csv tidak ditemukan!"
             exit 1
@@ -71,8 +70,8 @@ jobs:
         with:
           name: heart-preprocessed-${{ github.run_number }}
           path: |
-            heart_preprocessing_train.csv
-            heart_preprocessing_test.csv
+            preprocessing/heart_preprocessing_train.csv
+            preprocessing/heart_preprocessing_test.csv
           retention-days: 7
 
       - name: Write Job Summary
@@ -80,6 +79,6 @@ jobs:
           echo "## Hasil Preprocessing Pipeline" >> $GITHUB_STEP_SUMMARY
           echo "| File | Jumlah Baris |" >> $GITHUB_STEP_SUMMARY
           echo "|------|-------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| heart_preprocessing_train.csv | $(wc -l < heart_preprocessing_train.csv) |" >> $GITHUB_STEP_SUMMARY
-          echo "| heart_preprocessing_test.csv  | $(wc -l < heart_preprocessing_test.csv) |" >> $GITHUB_STEP_SUMMARY
+          echo "| heart_preprocessing_train.csv | $(wc -l < preprocessing/heart_preprocessing_train.csv) |" >> $GITHUB_STEP_SUMMARY
+          echo "| heart_preprocessing_test.csv  | $(wc -l < preprocessing/heart_preprocessing_test.csv) |" >> $GITHUB_STEP_SUMMARY
           echo "Preprocessing selesai pada: $(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_STEP_SUMMARY
