@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
 
-# 1. Konfigurasi MLflow Lokal (WAJIB)
+# 1. Konfigurasi MLflow Lokal
 mlflow.set_tracking_uri("http://127.0.0.1:5000/")
 mlflow.set_experiment("Heart Disease - Random Forest")
 
