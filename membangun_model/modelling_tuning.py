@@ -1,9 +1,5 @@
 # modelling_tuning.py
 
-# Install dependencies
-import subprocess
-subprocess.run(['pip', 'install', 'dagshub', 'mlflow', 'scikit-learn', 'matplotlib', 'seaborn'], check=True)
-
 import pandas as pd
 import numpy as np
 import mlflow
@@ -90,6 +86,6 @@ with mlflow.start_run(run_name="RF_Manual_Tuning"):
     plt.savefig('roc_curve.png')
     mlflow.log_artifact('roc_curve.png')
     
-    # Log Model
-    mlflow.sklearn.log_model(best_model, "random_forest_tuned")
-    print("Model tuning tersimpan lengkap ke MLflow lokal.")
+    # Log Model (Menggunakan path "model" untuk menghasilkan struktur .pkl yang diminta)
+    mlflow.sklearn.log_model(best_model, "model")
+    print("Model tuning tersimpan lengkap dengan file .pkl ke MLflow lokal.")
