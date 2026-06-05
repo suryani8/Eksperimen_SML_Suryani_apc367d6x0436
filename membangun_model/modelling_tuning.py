@@ -86,6 +86,6 @@ with mlflow.start_run(run_name="RF_Manual_Tuning"):
     plt.savefig('roc_curve.png')
     mlflow.log_artifact('roc_curve.png')
     
-    # Log Model (Menggunakan path "model" untuk menghasilkan struktur .pkl yang diminta)
+    # Log Model (Poin krusial: gunakan nama 'model')
     mlflow.sklearn.log_model(best_model, "model")
     print("Model tuning tersimpan lengkap dengan file .pkl ke MLflow lokal.")
